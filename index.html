@@ -52,7 +52,7 @@
     <p class="record-meta">게임을 완료한 사람이 없어도 서버가 새로운 타일 순서를 만들어 함께 시작할 수 있습니다.</p>
     <div id="liveSessionPanel" class="panel hidden" style="margin-top:12px;padding:16px"></div>
     <div id="groupProfilePanel" class="panel hidden" style="margin-top:18px;padding:16px"></div>
-    <p class="app-version">스트림스 메트로 · metro-0.11.1 · 2026-08-30</p>
+    <p class="app-version">스트림스 메트로 · metro-0.11.2 · 2026-09-05</p>
   </section>
 
   <main id="game" class="hidden">
@@ -169,13 +169,13 @@ function analysisEscape(value){return String(value).replace(/[&<>"']/g,char=>({"
 function statsPersonValue(row,key){return row[key]??row[{name:"display_name",studentId:"student_id",groupName:"group_name"}[key]]??""}
 function statsRowsWithoutExcluded(rows){return rows.filter(row=>!String(row.rankingExclusionReason||row.ranking_exclusion_reason||"").includes("ANALYSIS_EXCLUDED"))}
 function statsTable(rows,maps){return maps.map(map=>{const items=rows.filter(row=>String(row.map||row.map_type||"").toUpperCase()===map),stats=analysisStats(items);return`<tr><td>${map}형</td><td>${stats.count}</td><td>${stats.average}점</td><td>${stats.best}점</td><td>${stats.median}점</td></tr>`}).join("")}
-function openPersonalStats(){
+async function openPersonalStats(){
   $("#rulesTitle").textContent="개인 전적";
   const saved=state?.studentId||state?.displayName||$("#playerName")?.value.trim()||"";
-  $("#rulesBody").innerHTML=`<p class="score-guide">학생 코드 또는 게임에 사용한 이름을 입력하면 담당 맵과 다른 맵 연습 기록을 포함해 A~E형 전체 전적을 계산합니다. 같은 이름의 기록이 함께 집계됩니다.</p><div class="challenge-row"><input id="statsPersonInput" maxlength="24" value="${analysisEscape(saved)}" placeholder="예: KJS01 또는 이름"><button id="statsPersonSearchBtn" class="primary">전적 보기</button></div><div id="personalStatsResult"></div>`;
+  $("#rulesBody").innerHTML=`<p class="score-guide">학생 코드 또는 게임에 사용한 이름을 입력하면 담당 맵과 다른 맵 연습 기록을 포함해 A~E형 전체 전적을 계산합니다. 같은 이름의 기록이 함께 집계됩니다.</p><div class="challenge-row"><input id="statsPersonInput" maxlength="24" value="${analysisEscape(saved)}" placeholder="예: KJS01 또는 이름"><button id="statsPersonSearchBtn" class="primary">전적 보기</button></div><div id="personalStatsResult"><div class="empty-records">전적을 불러오는 중입니다…</div></div>`;
   $("#rulesModal").classList.remove("hidden");$("#closeRulesBtn").focus();
   const search=()=>renderPersonalStats($("#statsPersonInput").value.trim());$("#statsPersonSearchBtn").onclick=search;$("#statsPersonInput").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
-  if(saved)search();
+  try{await loadRankingRows();if(saved)search()}catch(error){$("#personalStatsResult").innerHTML=`<div class="empty-records">${analysisEscape(error.message)}<br>인터넷 연결을 확인한 뒤 다시 시도해 주세요.</div>`}
 }
 function renderPersonalStats(query){
   const q=String(query||"").trim().toLocaleLowerCase();if(!q){$("#personalStatsResult").innerHTML='<div class="empty-records">학생 코드 또는 이름을 입력해 주세요.</div>';return}
