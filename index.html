@@ -172,7 +172,7 @@ function statsTable(rows,maps){return maps.map(map=>{const items=rows.filter(row
 function openPersonalStats(){
   $("#rulesTitle").textContent="개인 전적";
   const saved=state?.studentId||state?.displayName||$("#playerName")?.value.trim()||"";
-  $("#rulesBody").innerHTML=`<p class="score-guide">학생 코드 또는 게임에 사용한 이름을 입력하면 맵별 전적을 계산합니다. 같은 이름으로 저장된 기록이 함께 집계됩니다.</p><div class="challenge-row"><input id="statsPersonInput" maxlength="24" value="${analysisEscape(saved)}" placeholder="예: KJS01 또는 이름"><button id="statsPersonSearchBtn" class="primary">전적 보기</button></div><div id="personalStatsResult"></div>`;
+  $("#rulesBody").innerHTML=`<p class="score-guide">학생 코드 또는 게임에 사용한 이름을 입력하면 담당 맵과 다른 맵 연습 기록을 포함해 A~E형 전체 전적을 계산합니다. 같은 이름의 기록이 함께 집계됩니다.</p><div class="challenge-row"><input id="statsPersonInput" maxlength="24" value="${analysisEscape(saved)}" placeholder="예: KJS01 또는 이름"><button id="statsPersonSearchBtn" class="primary">전적 보기</button></div><div id="personalStatsResult"></div>`;
   $("#rulesModal").classList.remove("hidden");$("#closeRulesBtn").focus();
   const search=()=>renderPersonalStats($("#statsPersonInput").value.trim());$("#statsPersonSearchBtn").onclick=search;$("#statsPersonInput").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
   if(saved)search();
